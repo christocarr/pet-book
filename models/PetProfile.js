@@ -26,6 +26,10 @@ const PetProfileSchema = new mongoose.Schema({
   bio: {
     type: String,
   },
+  date: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = PetProfile = mongoose.model('PetProfile', PetProfileSchema);

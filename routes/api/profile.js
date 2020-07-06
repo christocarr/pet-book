@@ -47,7 +47,7 @@ router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmp
   try {
     //find and update
     let petProfile = await PetProfile.findOne({ user: req.user.id });
-    
+    console.log(petProfile)
     if (petProfile) {
 
       petProfile = await PetProfile.findOneAndUpdate({ user: req.user.id }, { $set: petProfileFields }, { new: true }, { useFindAndModify: false });
@@ -57,8 +57,7 @@ router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmp
 
     //create if not found
     petProfile = new PetProfile(petProfileFields);
-    console.log('pet profile:', petProfile)
-    await PetProfile.save();
+    await petProfile.save();
     res.json(petProfile);
   } catch (err) {
     console.error(err);

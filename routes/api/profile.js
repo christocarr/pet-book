@@ -49,7 +49,6 @@ router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmp
     let petProfile = await PetProfile.findOne({ user: req.user.id });
 
     if (petProfile) {
-
       petProfile = await PetProfile.findOneAndUpdate({ user: req.user.id }, { $set: petProfileFields }, { new: true });
 
       return res.json(petProfile);
@@ -61,6 +60,39 @@ router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmp
     res.json(petProfile);
   } catch (err) {
     console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+//@route GET api/profile
+//@desc get all pet profiles
+//@access Public
+router.get('/', async (req, res) => {
+  try {
+    const petProfiles = await PetProfile.find().populate('users', ['name']);
+    res.json(petProfiles);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+//@route GET api/profile/user/:user_id
+//@desc get user profile by user id
+//@access Public
+router.get('/user/:user_id', async (req, res) => {
+  try {
+    const petProfile = await PetProfile.findOne({ user: req.params.user_id }).populate('users', ['name']);
+
+    if (!petProfile) {
+      return res.status(400).json({ msg: 'There are pet profiles for this user' });
+    }
+    res.json(petProfile);
+  } catch (err) {
+    console.log(err.message);
+    if (err.kind == 'ObjectId') {
+      return res.status(400).json({ msg: 'Profile not found' });
+    }
     res.status(500).send('Server error');
   }
 });

@@ -47,10 +47,10 @@ router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmp
   try {
     //find and update
     let petProfile = await PetProfile.findOne({ user: req.user.id });
-    console.log(petProfile)
+
     if (petProfile) {
 
-      petProfile = await PetProfile.findOneAndUpdate({ user: req.user.id }, { $set: petProfileFields }, { new: true }, { useFindAndModify: false });
+      petProfile = await PetProfile.findOneAndUpdate({ user: req.user.id }, { $set: petProfileFields }, { new: true });
 
       return res.json(petProfile);
     }

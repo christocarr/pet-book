@@ -27,17 +27,17 @@ router.get('/me', auth, async (req, res) => {
 //@route POST api/profile
 //@desc create or update pet profiles for user
 //@access Private
-router.post('/', [auth, [check('petname', 'Name of pet is required').not().isEmpty(), check('animal', 'Animal is required').not().isEmpty()]], async (req, res) => {
+router.post('/', [auth, [check('name', 'Name of pet is required').not().isEmpty(), check('animal', 'Animal is required').not().isEmpty()]], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { petname, animal, family, breed, age, bio } = req.body;
+  const { name, animal, family, breed, age, bio } = req.body;
   //create profile object
   const petProfileFields = {};
   petProfileFields.user = req.user.id;
-  if (petname) petProfileFields.petname = petname;
+  if (name) petProfileFields.name = name;
   if (animal) petProfileFields.animal = animal;
   if (family) petProfileFields.family = family;
   if (breed) petProfileFields.breed = breed;
@@ -85,7 +85,7 @@ router.get('/user/:user_id', async (req, res) => {
     const petProfile = await PetProfile.findOne({ user: req.params.user_id }).populate('users', ['name']);
 
     if (!petProfile) {
-      return res.status(400).json({ msg: 'There are pet profiles for this user' });
+      return res.status(400).json({ msg: 'There are no pet profiles for this user' });
     }
     res.json(petProfile);
   } catch (err) {
@@ -93,6 +93,25 @@ router.get('/user/:user_id', async (req, res) => {
     if (err.kind == 'ObjectId') {
       return res.status(400).json({ msg: 'Profile not found' });
     }
+    res.status(500).send('Server error');
+  }
+});
+
+//@route DELETE api/profile
+//@desc delete profile, user
+//@access Private
+router.delete('/', auth, async (req, res) => {
+  try {
+    //todo - remove user posts
+
+    //remove pet profile
+    await PetProfile.findOneAndRemove({ user: req.user.id });
+
+    //remove user
+    await User.findOneAndRemove({ _id: req.user.id });
+    res.json({ msg: 'User removed' });
+  } catch (err) {
+    console.log(err.message);
     res.status(500).send('Server error');
   }
 });

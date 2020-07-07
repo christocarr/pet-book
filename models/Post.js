@@ -6,6 +6,10 @@ const PostSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'petProfile'
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'user'
+  },
   text: {
     type: String,
     required: true
